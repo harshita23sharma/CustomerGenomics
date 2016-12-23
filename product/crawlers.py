@@ -1,9 +1,11 @@
 class Crawler():
-    def f7(seq):
+    def __init__(self):
+        pass
+    def f7(self,seq):
         seen = set()
         seen_add = seen.add
         return [x for x in seq if not (x in seen or seen_add(x))]
-    def crawl(platform,keyword):
+    def crawl(self,platform,keyword):
         from selenium import webdriver
         from pyvirtualdisplay import Display
         import requests
@@ -90,6 +92,8 @@ class Crawler():
         else:
             print("platform name does not match with either amazon or flipcart\n")
 
+        def __str__(self):
+            return str(self.name)
 # if __name__ == '__main__':
 # 	a,b = _crawl('flipcart','moto g3')
 # 	print a

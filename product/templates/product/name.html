@@ -43,7 +43,7 @@
       </div>
 
     <section class = "radio">
-	<form action="selected-result/" method="POST">
+	<form action="selected-result/" method="POST" onsubmit="return main_scrapy()">
 		{% csrf_token %}
 		{{ form.as_p }}
    <!--  {{amazon_url_list}}
@@ -99,7 +99,7 @@
                
       </div>
 
-      <input type = "submit" value="send form"> 
+      <input type = "submit" value="send form" > 
       </div>
      
 

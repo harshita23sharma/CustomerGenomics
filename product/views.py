@@ -18,9 +18,18 @@ from product.forms import NameForm
 from product.forms import SelectForm
 
 from product.crawlers import Crawler
-
+import amazon_crawl
+from amazon_crawl.main_scrapy_amazon import main_scrapy
+from snapdeal_crawl.main_snapdeal import main_snap
+from review_analysis.main_sentiments import main_sent
+global a #amazon_url
+global b #amazon_name
+global c #snapdeal_url
+global d #snapdeal_name
+global resultt
 def name(request):
     # if this is a POST request we need to process the form data
+    obj = Crawler()
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
         # print(request.POST)
@@ -32,10 +41,13 @@ def name(request):
         # check whether it's valid:
         if form.is_valid():
             print("insidwee......")
-            a,b = Crawler.crawl('amazon',form["your_product"].value())
+            print("debbuugg")
+            print(form["your_product"].value().decode('UTF-8'))
+            a,b = obj.crawl('amazon',form["your_product"].value().decode('UTF-8'))
+
             dictionary = dict(zip(b, a))
             print(dictionary)
-            c,d = Crawler.crawl('snapdeal',form["your_product"].value())
+            c,d = obj.crawl('snapdeal',form["your_product"].value().decode('UTF-8'))
             print(c)
             print(d)
             dictionary2 = dict(zip(d, c))
@@ -49,9 +61,15 @@ def name(request):
     return render(request, 'name.html', {'form': form})
 
 def results(request):  
-    text = request.session.get("text", None)
-    c = {'text' : text}
-    return render_to_response('results.html', c)
+    # text = request.session.get("text", None)
+    amazon_result_pos = 5
+    amazon_result_neg = 5
+    snapdeal_result_pos= 6
+    snapdeal_result_neg = 4
+    
+
+    c = {'amazon_result_pos':amazon_result_pos,'amazon_result_neg':amazon_result_neg,'snapdeal_result_pos':snapdeal_result_pos,'snapdeal_result_neg':snapdeal_result_neg }
+    return render(request, 'results.html', c)
 
 
 
@@ -71,11 +89,12 @@ def input_crawl(result):
 
 def selected(request):
     # if this is a POST request we need to process the form data
+    global resultt
     if request.method == 'POST':
         form = SelectForm(request.POST)
         print("debugggg 0")
         resultt = (form["selected_choice"].value())
-        print(resultt)
+        #print(resultt)
         print(form["selected_choice"].value())
         # check whether it's valid:
         if form.is_valid():
@@ -83,4 +102,19 @@ def selected(request):
         else:
             print("debug !form is_valid")
 
-            return render(request, "selected.html" , {'form' : form,'resultt':resultt})
+        # main_scrapy()
+        # main_snap()
+        main_sent()
+        import review_analysis
+        from review_analysis import training
+
+        
+        pos_rev_amz = training.pos_review[0]
+        neg_rev_amz = training.neg_review[0]
+        tot_rev_amz = training.tot_review[0]
+        pos_rev_snap = training.pos_review[1]
+        neg_rev_snap = training.neg_review[1]
+        tot_rev_snap = training.tot_review[1]
+        return render(request, "selected.html" , {'form' : form,'resultt':resultt,'pos_rev_amz' : pos_rev_amz,'neg_rev_amz':neg_rev_amz,'tot_rev_amz':tot_rev_amz,'pos_rev_snap' : pos_rev_snap,'neg_rev_snap':neg_rev_snap,'tot_rev_snap':tot_rev_snap})
+
+    
